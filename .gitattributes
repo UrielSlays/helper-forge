@@ -1,0 +1,4 @@
+# Check out text files with LF line endings on every platform. A helper
+# manifest's implementation_digest is a hash of the runtime files' bytes, so
+# one commit has to produce the same bytes on Windows and on Linux.
+* text=auto eol=lf

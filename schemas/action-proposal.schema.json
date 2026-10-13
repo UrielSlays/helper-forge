@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hephaestus.local/schemas/action-proposal.schema.json",
+  "title": "Hephaestus Prototype Action Proposal v0",
+  "$comment": "Structural preflight only. Prototype/v0 runtime does not emit proposals because source authentication is not implemented; the strict Python parser remains authoritative.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "proposal_id",
+    "helper_id",
+    "scenario_id",
+    "event_id",
+    "event_digest",
+    "evidence_signal_id",
+    "playbook_id",
+    "action_type",
+    "target",
+    "reason",
+    "proposed_at",
+    "approval_state"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "hephaestus.prototype.action-proposal/v0"
+    },
+    "proposal_id": {
+      "$ref": "#/$defs/digest"
+    },
+    "helper_id": {
+      "$ref": "#/$defs/digest"
+    },
+    "scenario_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "event_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "event_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "evidence_signal_id": {
+      "$ref": "#/$defs/digest"
+    },
+    "playbook_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "action_type": {
+      "enum": [
+        "close_port",
+        "isolate_host",
+        "block_address"
+      ]
+    },
+    "target": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/closePortTarget"
+        },
+        {
+          "$ref": "#/$defs/isolateHostTarget"
+        },
+        {
+          "$ref": "#/$defs/blockAddressTarget"
+        }
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "proposed_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?Z$"
+    },
+    "approval_state": {
+      "const": "requires_approval"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "action_type": {
+            "const": "close_port"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "target": {
+            "$ref": "#/$defs/closePortTarget"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "action_type": {
+            "const": "isolate_host"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "target": {
+            "$ref": "#/$defs/isolateHostTarget"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "action_type": {
+            "const": "block_address"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "target": {
+            "$ref": "#/$defs/blockAddressTarget"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "asset": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+    },
+    "closePortTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "host",
+        "port",
+        "protocol"
+      ],
+      "properties": {
+        "host": {
+          "$ref": "#/$defs/asset"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "protocol": {
+          "enum": [
+            "tcp",
+            "udp"
+          ]
+        }
+      }
+    },
+    "isolateHostTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "host"
+      ],
+      "properties": {
+        "host": {
+          "$ref": "#/$defs/asset"
+        }
+      }
+    },
+    "blockAddressTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "address"
+      ],
+      "properties": {
+        "address": {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "ipv4"
+            },
+            {
+              "type": "string",
+              "format": "ipv6"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

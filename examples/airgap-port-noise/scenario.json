@@ -1,0 +1,43 @@
+{
+  "schema_version": "hephaestus.prototype.scenario-pack/v0",
+  "scenario_id": "airgap-port-noise-v1",
+  "purpose": "Reduce repeated port telemetry while preserving urgent events and withholding actions until source authentication exists.",
+  "policy": {
+    "mode": "air_gap",
+    "admitted_source_labels": [
+      "sensor.dmz-01",
+      "sensor.core-01"
+    ],
+    "coalesce_window_seconds": 30,
+    "coalesce_severities": [
+      "low",
+      "medium"
+    ],
+    "preserve_severities": [
+      "high",
+      "critical"
+    ],
+    "max_event_bytes": 8192,
+    "max_total_event_bytes": 1048576,
+    "max_event_count": 4096,
+    "max_active_groups": 2048
+  },
+  "playbooks": [
+    {
+      "playbook_id": "reviewed-close-exposed-port-v1",
+      "match_event_type": "network.exposed_port",
+      "grouping_fields": [
+        "asset",
+        "destination_port",
+        "protocol"
+      ],
+      "action_type": "close_port",
+      "bindings": {
+        "host": "asset",
+        "port": "destination_port",
+        "protocol": "protocol"
+      },
+      "reason": "Scenario owner reviewed closure of a newly exposed service port. External approval is still required."
+    }
+  ]
+}

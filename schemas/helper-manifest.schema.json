@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hephaestus.local/schemas/helper-manifest.schema.json",
+  "title": "Hephaestus Prototype Helper Manifest v0",
+  "$comment": "Structural preflight only. Runtime validation recomputes the manifest identity and installed implementation digest.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "helper_id",
+    "helper_kind",
+    "implementation_version",
+    "implementation_digest",
+    "scenario_id",
+    "scenario_digest",
+    "capabilities",
+    "playbook_ids"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "hephaestus.prototype.helper-manifest/v0"
+    },
+    "helper_id": {
+      "$ref": "#/$defs/digest"
+    },
+    "helper_kind": {
+      "const": "deterministic.noise-dampener"
+    },
+    "implementation_version": {
+      "const": "0"
+    },
+    "implementation_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "scenario_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "scenario_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "capabilities": {
+      "const": [
+        "coalesce-low-medium",
+        "preserve-high-critical",
+        "route-by-admitted-source-label",
+        "withhold-actions-without-source-authentication"
+      ]
+    },
+    "playbook_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/identifier"
+      }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}

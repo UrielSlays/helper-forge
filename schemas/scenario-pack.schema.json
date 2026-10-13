@@ -1,0 +1,264 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hephaestus.local/schemas/scenario-pack.schema.json",
+  "title": "Hephaestus Prototype Scenario Pack v0",
+  "$comment": "Structural preflight only. The strict Python contract is authoritative for prototype/v0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scenario_id",
+    "purpose",
+    "policy",
+    "playbooks"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "hephaestus.prototype.scenario-pack/v0"
+    },
+    "scenario_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "admitted_source_labels",
+        "coalesce_window_seconds",
+        "coalesce_severities",
+        "preserve_severities",
+        "max_event_bytes",
+        "max_total_event_bytes",
+        "max_event_count",
+        "max_active_groups"
+      ],
+      "properties": {
+        "mode": {
+          "const": "air_gap"
+        },
+        "admitted_source_labels": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "coalesce_window_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400
+        },
+        "coalesce_severities": {
+          "const": [
+            "low",
+            "medium"
+          ]
+        },
+        "preserve_severities": {
+          "const": [
+            "high",
+            "critical"
+          ]
+        },
+        "max_event_bytes": {
+          "type": "integer",
+          "minimum": 256,
+          "maximum": 65536
+        },
+        "max_total_event_bytes": {
+          "type": "integer",
+          "minimum": 256,
+          "maximum": 16777216
+        },
+        "max_event_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50000
+        },
+        "max_active_groups": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8192
+        }
+      }
+    },
+    "playbooks": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "$ref": "#/$defs/playbook"
+      }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+    },
+    "fieldName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$",
+      "not": {
+        "enum": [
+          "argv",
+          "bash",
+          "cmd",
+          "command",
+          "executable",
+          "powershell",
+          "script",
+          "shell"
+        ]
+      }
+    },
+    "playbook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "playbook_id",
+        "match_event_type",
+        "grouping_fields",
+        "action_type",
+        "bindings",
+        "reason"
+      ],
+      "properties": {
+        "playbook_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "match_event_type": {
+          "$ref": "#/$defs/identifier"
+        },
+        "grouping_fields": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/fieldName"
+          }
+        },
+        "action_type": {
+          "enum": [
+            "close_port",
+            "isolate_host",
+            "block_address"
+          ]
+        },
+        "bindings": {
+          "type": "object"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "action_type": {
+                "const": "close_port"
+              }
+            },
+            "required": [
+              "action_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "bindings": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "host",
+                  "port",
+                  "protocol"
+                ],
+                "properties": {
+                  "host": {
+                    "$ref": "#/$defs/fieldName"
+                  },
+                  "port": {
+                    "$ref": "#/$defs/fieldName"
+                  },
+                  "protocol": {
+                    "$ref": "#/$defs/fieldName"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action_type": {
+                "const": "isolate_host"
+              }
+            },
+            "required": [
+              "action_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "bindings": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "host"
+                ],
+                "properties": {
+                  "host": {
+                    "$ref": "#/$defs/fieldName"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action_type": {
+                "const": "block_address"
+              }
+            },
+            "required": [
+              "action_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "bindings": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "address"
+                ],
+                "properties": {
+                  "address": {
+                    "$ref": "#/$defs/fieldName"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

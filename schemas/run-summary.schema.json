@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hephaestus.local/schemas/run-summary.schema.json",
+  "title": "Hephaestus Prototype Run Summary v0",
+  "$comment": "Structural preflight only. The strict Python contract is authoritative for prototype/v0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "helper_id",
+    "scenario_id",
+    "events_processed",
+    "dispositions",
+    "action_statuses",
+    "action_proposals"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "hephaestus.prototype.run-summary/v0"
+    },
+    "record_type": {
+      "const": "summary"
+    },
+    "helper_id": {
+      "$ref": "#/$defs/digest"
+    },
+    "scenario_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "events_processed": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "dispositions": {
+      "$ref": "#/$defs/dispositionCounts"
+    },
+    "action_statuses": {
+      "$ref": "#/$defs/actionStatusCounts"
+    },
+    "action_proposals": {
+      "const": 0
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "dispositionCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["forwarded", "coalesced", "rejected"],
+      "properties": {
+        "forwarded": {"$ref": "#/$defs/count"},
+        "coalesced": {"$ref": "#/$defs/count"},
+        "rejected": {"$ref": "#/$defs/count"}
+      }
+    },
+    "actionStatusCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authentication_required",
+        "no_playbook",
+        "invalid_target",
+        "not_evaluated"
+      ],
+      "properties": {
+        "authentication_required": {"$ref": "#/$defs/count"},
+        "no_playbook": {"$ref": "#/$defs/count"},
+        "invalid_target": {"$ref": "#/$defs/count"},
+        "not_evaluated": {"$ref": "#/$defs/count"}
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+[build-system]
+requires = []
+build-backend = "_hephaestus_build"
+backend-path = ["."]
+
+[project]
+name = "hephaestus-forge"
+version = "0.0.0"
+description = "An air-gap-first forge for small, bounded local helpers."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "Clinton Cuzzort" }]
+dependencies = []
+
+[project.scripts]
+hephaestus = "hephaestus.cli:main"

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hephaestus.local/schemas/event-result.schema.json",
+  "title": "Hephaestus Prototype Event Result v0",
+  "$comment": "Structural preflight only. The strict Python contract is authoritative for prototype/v0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "signal",
+    "action_proposals"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "hephaestus.prototype.event-result/v0"
+    },
+    "record_type": {
+      "const": "event_result"
+    },
+    "signal": {
+      "$ref": "signal.schema.json"
+    },
+    "action_proposals": {
+      "type": "array",
+      "maxItems": 0,
+      "items": {
+        "$ref": "action-proposal.schema.json"
+      }
+    }
+  }
+}

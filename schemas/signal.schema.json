@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hephaestus.local/schemas/signal.schema.json",
+  "title": "Hephaestus Prototype Signal v0",
+  "$comment": "Structural preflight only. Runtime validation enforces cross-field invariants and recomputes signal_id.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "signal_id",
+    "helper_id",
+    "scenario_id",
+    "event_id",
+    "event_digest",
+    "observed_at",
+    "source",
+    "severity",
+    "disposition",
+    "reason_code",
+    "representative_event_id",
+    "representative_event_digest",
+    "occurrence_count",
+    "action_status"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "hephaestus.prototype.signal/v0"
+    },
+    "signal_id": {
+      "$ref": "#/$defs/digest"
+    },
+    "helper_id": {
+      "$ref": "#/$defs/digest"
+    },
+    "scenario_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "event_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "event_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "observed_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?Z$"
+    },
+    "source": {
+      "$ref": "#/$defs/identifier"
+    },
+    "severity": {
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ]
+    },
+    "disposition": {
+      "enum": [
+        "forwarded",
+        "coalesced",
+        "rejected"
+      ]
+    },
+    "reason_code": {
+      "enum": [
+        "duplicate_within_window",
+        "admitted_critical_passthrough",
+        "admitted_high_passthrough",
+        "admitted_low_medium_invalid_grouping_key",
+        "admitted_low_medium_new",
+        "admitted_low_medium_no_grouping_rule",
+        "admitted_low_medium_out_of_order",
+        "admitted_low_medium_window_expired",
+        "unadmitted_source_label"
+      ]
+    },
+    "representative_event_id": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/identifier"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "representative_event_digest": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/digest"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "occurrence_count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647
+    },
+    "action_status": {
+      "enum": [
+        "authentication_required",
+        "no_playbook",
+        "invalid_target",
+        "not_evaluated"
+      ]
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}
